@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trendstore-deployment
+  namespace: trendstore-ns
+  labels:
+    app: trendstore-label
+    
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: trendstore-label
+  template:
+    metadata:
+      labels:
+        app: trendstore-label
+    spec:
+      containers:
+      - name: trendstore-container
+        image: ajaykumar91/trendstore:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"

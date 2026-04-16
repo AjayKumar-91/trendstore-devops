@@ -1,0 +1,36 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Node (if ever used)
+node_modules/
+
+# Build tools (not needed here but safe)
+dist.zip
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Keys
+*.pem
+jenkins-key-auto
+
+# OS
+.DS_Store
+
+# Logs
+*.log
