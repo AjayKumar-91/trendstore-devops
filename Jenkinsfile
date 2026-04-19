@@ -1,16 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = "ajaykumar91/trendstore-app:latest"
-        DOCKERHUB_REPO = "ajaykumar91/trendstore-app"
-        TAG = "latest"
-    }
-
-    triggers {
-            githubPush()
-        }
-
     stages {
         stage('Checkout Code') {
             steps {
@@ -18,24 +8,10 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/AjayKumar-91/TrendStore.git'
             }
         }
-        
-        stage('Test Docker') {
-            steps {
-                sh 'docker version'
-                sh 'docker ps'
-            }
-        }
-
-        stage('Debug Workspace') {
-            steps {
-                sh 'pwd'
-                sh 'ls -R'
-           }
-       }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'docker build -t trendstore-app .'
             }
         }
 
@@ -48,11 +24,22 @@ pipeline {
                 )]){ 
                     sh '''
                     echo $dockerHubPass | docker login -u $dockerHubUser --password-stdin
-                    docker push $DOCKERHUB_REPO:$TAG
-                    docker tag $DOCKER_IMAGE $DOCKER_IMAGE
-                    docker push $DOCKER_IMAGE
+                    docker tag trendstore-app $dockerHubUser/trendstore-app:latest
+                    docker push $dockerHubUser/trendstore-app:latest
                     '''
                 }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh '''
+                docker stop flask-app || true
+                docker rm flask-app || true
+                docker rmi trendstore-app || true
+                docker compose down || true
+                docker compose up -d --build trendstore
+                '''
             }
         }
         
@@ -78,7 +65,7 @@ pipeline {
                 */
             }
         }
-        
+
         stage('Verify Monitoring') {
             steps {
                 echo "Monitoring setup verified successfully."
