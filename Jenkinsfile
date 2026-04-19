@@ -51,7 +51,7 @@ pipeline {
                 // sh 'kubectl apply -f deployment.yaml'
                 // sh 'kubectl apply -f service.yaml'
                 sh 'docker compose down || true'
-                sh 'docker compose up -d --build trendstore-app'
+                sh 'docker compose up -d --build trendstore'
             }
         }
     }
