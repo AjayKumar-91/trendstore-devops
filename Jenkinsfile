@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage("Code Clone Checkout") {
             steps {
-                git branch: 'main', url: 'https://github.com/Vennilavanguvi/Trend.git'
+                git branch: 'master', url: 'https://github.com/AjayKumar-91/TrendStore.git'
             }
         }
 
@@ -38,7 +38,7 @@ pipeline {
                 passwordVariable: "dockerHubPass"
                 )]) {
                 sh '''
-                docker login -u $dockerHubUser -p $dockerHubPass
+                echo $dockerHubPass | docker login -u $dockerHubUser --password-stdin
                 docker push $DOCKERHUB_REPO:$TAG
                 '''
                }
@@ -47,9 +47,11 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'aws eks update-kubeconfig --name trend-eks-cluster --region us-east-1'
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                // sh 'aws eks update-kubeconfig --name trend-eks-cluster --region us-east-1'
+                // sh 'kubectl apply -f deployment.yaml'
+                // sh 'kubectl apply -f service.yaml'
+                sh 'docker compose down || true'
+                sh 'docker compose up -d --build trendstore-app'
             }
         }
     }
