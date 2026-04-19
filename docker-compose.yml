@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   trendstore:
-    image: ajaykumar91/trendstore:latest
+    image: ajaykumar91/trendstore-app:latest
     container_name: trendstore-container
     ports:
       - "3000:80"
