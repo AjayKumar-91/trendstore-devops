@@ -34,8 +34,8 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 sh '''
-                docker stop flask-app || true
-                docker rm flask-app || true
+                docker stop trendstore-app || true
+                docker rm trendstore-app || true
                 docker rmi trendstore-app || true
                 docker compose down || true
                 docker compose up -d --build trendstore

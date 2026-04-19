@@ -72,6 +72,5 @@ networks:
 
 volumes:
   prometheus_data: {}
-  grafana_data: {}
-  cadvisor_data: {}    
+  grafana_data: {} 
 
