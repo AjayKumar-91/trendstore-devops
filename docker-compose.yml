@@ -1,11 +1,8 @@
 services:
   trendstore:
-<<<<<<< HEAD
-=======
     build:
       context: .
       dockerfile: Dockerfile
->>>>>>> ee54f22 (fix: docker and nginx deployment working)
     image: ajaykumar91/trendstore-app:latest
     container_name: trendstore-container
     ports:
@@ -73,14 +70,14 @@ services:
 
 
 networks:
-<<<<<<< HEAD
+
   trend-network:
     driver: bridge
-=======
+
   trend-nw:
     driver: bridge
 
 volumes:
   prometheus_data: {}
   grafana_data: {}    
->>>>>>> ee54f22 (fix: docker and nginx deployment working)
+
