@@ -1,8 +1,5 @@
 services:
   trendstore:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: ajaykumar91/trendstore-app:latest
     container_name: trendstore-container
     ports:
@@ -70,14 +67,11 @@ services:
 
 
 networks:
-
-  trend-network:
-    driver: bridge
-
   trend-nw:
     driver: bridge
 
 volumes:
   prometheus_data: {}
-  grafana_data: {}    
+  grafana_data: {}
+  cadvisor_data: {}    
 
