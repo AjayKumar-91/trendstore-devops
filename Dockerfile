@@ -1,10 +1,13 @@
 FROM nginx:alpine
 
-# Remove default nginx files
 RUN rm -rf /usr/share/nginx/html/*
 
+<<<<<<< HEAD
 # Copy built files
 COPY . /usr/share/nginx/html
+=======
+COPY Trend/dist/ /usr/share/nginx/html/
+>>>>>>> ee54f22 (fix: docker and nginx deployment working)
 
 EXPOSE 80
 
