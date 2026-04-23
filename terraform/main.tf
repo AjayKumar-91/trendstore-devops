@@ -1,3 +1,4 @@
+# ---------------- AWS Key Pair ----------------
 resource "aws_key_pair" "jenkins_key" {
   provider   = aws.virginia
   key_name   = "jenkins-key-auto"
@@ -41,6 +42,14 @@ resource "aws_route_table" "rt" {
   }
 }
 
+# ---------------- Route ----------------
+resource "aws_route" "internet_access" {
+  route_table_id         = aws_route_table.rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+}
+
+# ---------------- Route Table Association ----------------
 resource "aws_route_table_association" "rta" {
   provider       = aws.virginia
   subnet_id      = aws_subnet.subnet_virginia.id
@@ -79,10 +88,34 @@ resource "aws_security_group" "jenkins_sg" {
   }
 
   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    description = "Allow TrendStore App"
+    cidr_blocks = ["0.0.0.0/0"] # Application
+  }
+
+  ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    description = "Allow TrendStore App"
+    description = "Allow Grafana UI"
+    cidr_blocks = ["0.0.0.0/0"] # Application
+  }
+
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    description = "Allow Prometheus UI"
+    cidr_blocks = ["0.0.0.0/0"] # Application
+  }
+
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    description = "Allow Node Exporter"
     cidr_blocks = ["0.0.0.0/0"] # Application
   }
 
@@ -169,6 +202,12 @@ resource "aws_instance" "jenkins" {
 
               sudo usermod -aG docker ubuntu
               sudo usermod -aG docker jenkins
+
+              # Install kubectl
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              mv kubectl /usr/local/bin/
+
               EOF
 
   # root storage (EBS)
@@ -180,4 +219,9 @@ resource "aws_instance" "jenkins" {
   tags = {
     Name = "Jenkins-Server"
   }
+}
+
+# ---------------- Output ----------------
+output "jenkins_url" {
+  value = "http://${aws_instance.jenkins.public_ip}:8080"
 }

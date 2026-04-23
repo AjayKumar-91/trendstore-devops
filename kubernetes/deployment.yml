@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trendstore-deployment
-  namespace: trendstore-ns
   labels:
     app: trendstore-label
     

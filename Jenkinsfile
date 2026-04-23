@@ -1,50 +1,90 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "ajaykumar91/trendstore-app"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        AWS_REGION = "ap-south-1"
+        CLUSTER_NAME = "trend-eks-cluster"
+    }
+
     stages {
 
         stage('Checkout Code') {
             steps {
                 deleteDir()
-                git branch: 'master', url: 'https://github.com/AjayKumar-91/TrendStore.git'
+                git branch: 'master', url: 'https://github.com/AjayKumar-91/trendstore-devops.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t trendstore-app .'
+                sh 'docker build -t $DOCKER_IMAGE:$IMAGE_TAG .'
             }
         }
 
-        stage('Login & Push Image to Docker Hub') {
+        stage('Login & Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: "DockerHub_Credentials",
-                    passwordVariable: "dockerHubPass",
-                    usernameVariable: "dockerHubUser"
+                    usernameVariable: "DOCKER_USER",
+                    passwordVariable: "DOCKER_PASS"
                 )]) {
                     sh '''
-                        echo "$dockerHubPass" | docker login -u "$dockerHubUser" --password-stdin
-                        docker tag trendstore-app $dockerHubUser/trendstore-app:latest
-                        docker push $dockerHubUser/trendstore-app:latest
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_IMAGE:$IMAGE_TAG
+                        docker tag $DOCKER_IMAGE:$IMAGE_TAG $DOCKER_IMAGE:latest
+                        docker push $DOCKER_IMAGE:latest
                     '''
                 }
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Update Kubeconfig') {
+            steps {
+                sh 'aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    docker compose down || true
-                    docker compose up -d --build
+                    sed -i 's|IMAGE_TAG|'"$IMAGE_TAG"'|g' kubernetes/deployment.yaml
+                    kubectl apply -f kubernetes/deployment.yaml
+                    kubectl apply -f kubernetes/service.yaml
                 '''
             }
         }
 
-        stage('Verify') {
+        stage('Verify Kubernetes Deployment') {
             steps {
-                sh 'docker ps'
+                sh 'kubectl get pods -o wide'
+                sh 'kubectl get svc'
             }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker rmi $DOCKER_IMAGE:$IMAGE_TAG || true'
+            }
+        }
+    }
+
+    stage('Check Monitoring Health') {
+        steps {
+            sh '''
+                echo "Checking Prometheus targets..."
+                curl -s http://prometheus.monitoring.svc.cluster.local:9090/-/ready || true
+                '''
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }

@@ -1,0 +1,18 @@
+groups:
+- name: cpu-alerts
+  rules:
+  - alert: HighCPU
+    expr: 100 - (avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 2m
+
+- name: cluster-alerts
+  rules:
+  - alert: NodeDown
+    expr: up == 0
+    for: 1m
+
+- name: memory-alerts
+  rules:
+  - alert: HighMemory
+    expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.2
+    for: 2m
