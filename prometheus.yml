@@ -8,7 +8,7 @@ rule_files:
 scrape_configs:
   - job_name: 'trendstore'
     static_configs:
-      - targets: ['trendstore-container:80']
+      - targets: ['trendstore-container:5000']
 
   - job_name: 'node-exporter'
     static_configs:

@@ -4,15 +4,22 @@ resource "aws_eks_node_group" "nodegroup" {
   node_role_arn   = aws_iam_role.node_role.arn
   subnet_ids      = module.vpc.private_subnets
 
+  instance_types = ["t3.medium"]
+  disk_size      = 30
+
   scaling_config {
     desired_size = 2
-    max_size     = 3
     min_size     = 1
+    max_size     = 3
   }
 
-  instance_types = ["t3.medium"]
+  labels = {
+    role = "general"
+  }
 
-  depends_on = [
-    aws_eks_cluster.eks
-  ]
+  update_config {
+    max_unavailable = 1
+  }
+
+  depends_on = [aws_eks_cluster.eks]
 }

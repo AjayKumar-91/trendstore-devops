@@ -1,2 +1,82 @@
+# local run application
+npm install -g serve
+serve -s . -l 3000
+
+# Docker Setup Build Image
+docker build -t trendstore-app .
+
+# Rebuild clean
+docker build --no-cache -t trendstore-app .
+
+# Dockerfile run containers
+docker run -d -p 5000:80 trendstore-app
+docker run -d --name trend-app -p 5000:80 trendstore-app
+
+# inside container
+docker run -it trendstore-app sh
+ls /usr/share/nginx/html
+
 docker compose down -v
 docker compose up -d
+
+docker ps
+docker ps -a
+docker images
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker rmi $(docker images -q)
+docker system prune -a
+docker ps
+docker ps -a
+docker images
+
+
+# terraform
+terraform fmt
+terraform init
+terraform validate
+terraform plan
+terraform apply -auto-approve
+terraform destroy -auto-approve
+terraform destroy -auto-approve && terraform apply -auto-approve
+
+# Recreate EC2 with correct key
+terraform taint aws_instance.jenkins
+terraform apply
+
+cp jenkins-key-auto ~/
+cd ~
+chmod 400 jenkins-key-auto
+ssh -i ~/jenkins-key-auto ubuntu@13.220.63.209
+
+chmod 400 jenkins-key-auto
+ssh -i jenkins-key-auto ubuntu@<NEW-IP>
+ssh -i jenkins-key-auto ubuntu@ec2-13-220-63-209.compute-1.amazonaws.com
+
+aws configure
+AWS Access Key ID [None]: AKIAxxxxxxxx
+AWS Secret Access Key [None]: xxxxxxxxx
+Default region name [None]: us-east-1
+Default output format [None]: json
+
+aws configure --profile dev
+
+# correct path for Git Bash
+ssh -i /d/devops_projects/TrendStore/terraform/jenkins-key-auto ubuntu@3.237.173.35
+ls /d/devops_projects/TrendStore/terraform
+chmod 400 /d/devops_projects/TrendStore/terraform/jenkins-key-auto
+ssh -i /d/devops_projects/TrendStore/terraform/jenkins-key-auto ubuntu@3.237.173.35
+
+# create a Docker Hub repository
+docker login
+docker build -t trendstore-app .
+docker tag trendstore-app ajaykumar91/trendstore-app:latest
+docker push ajaykumar91/trendstore-app:latest
+
+
+
+aws eks --region us-east-1 update-kubeconfig --name trend-eks-cluster
+
+#  Connect to cluster
+aws eks update-kubeconfig --region us-east-1 --name trend-eks-cluster
+kubectl get nodes

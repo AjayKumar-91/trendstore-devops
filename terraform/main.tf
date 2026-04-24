@@ -7,11 +7,14 @@ resource "aws_key_pair" "jenkins_key" {
 
 # ---------------- VPC ----------------
 resource "aws_vpc" "vpc_virginia" {
-  provider   = aws.virginia
-  cidr_block = "10.1.0.0/16"
+  provider             = aws.virginia
+  cidr_block           = "10.1.0.0/16"
   enable_dns_support   = true
-  enable_dns_hostnames = true 
-  tags       = { Name = "virginia-vpc" }
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "virginia-vpc"
+  }
 }
 
 # ---------------- Subnet ----------------
@@ -21,14 +24,20 @@ resource "aws_subnet" "subnet_virginia" {
   cidr_block              = "10.1.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  tags                    = { Name = "virginia-subnet" }
+
+  tags = {
+    Name = "virginia-subnet"
+  }
 }
 
 # ---------------- Internet Gateway ----------------
 resource "aws_internet_gateway" "igw" {
   provider = aws.virginia
   vpc_id   = aws_vpc.vpc_virginia.id
-  tags     = { Name = "trend-igw" }
+
+  tags = {
+    Name = "trend-igw"
+  }
 }
 
 # ---------------- Route Table ----------------
@@ -42,19 +51,13 @@ resource "aws_route_table" "rt" {
   }
 }
 
-# ---------------- Route ----------------
-resource "aws_route" "internet_access" {
-  route_table_id         = aws_route_table.rt.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw.id
-}
-
 # ---------------- Route Table Association ----------------
 resource "aws_route_table_association" "rta" {
   provider       = aws.virginia
   subnet_id      = aws_subnet.subnet_virginia.id
   route_table_id = aws_route_table.rt.id
 }
+
 
 # ---------------- Security Group ----------------
 resource "aws_security_group" "jenkins_sg" {
@@ -88,8 +91,8 @@ resource "aws_security_group" "jenkins_sg" {
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     description = "Allow TrendStore App"
     cidr_blocks = ["0.0.0.0/0"] # Application
@@ -149,9 +152,19 @@ resource "aws_iam_role" "ec2_role" {
 }
 
 # Attach Admin policy (for demo purpose)
-resource "aws_iam_role_policy_attachment" "admin_attach" {
+resource "aws_iam_role_policy_attachment" "ssm_attach" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
 # Instance profile
@@ -169,7 +182,7 @@ resource "aws_instance" "jenkins" {
   subnet_id                   = aws_subnet.subnet_virginia.id
   vpc_security_group_ids      = [aws_security_group.jenkins_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.profile.name
-  
+
   user_data = <<-EOF
               #!/bin/bash
               set -eux
@@ -178,7 +191,7 @@ resource "aws_instance" "jenkins" {
               apt update -y
               apt upgrade -y
 
-              # Java 17 (stable for Jenkins)
+              # Java 21 (stable for Jenkins)
               sudo apt install fontconfig openjdk-21-jre -y
 
               # Install Jenkins

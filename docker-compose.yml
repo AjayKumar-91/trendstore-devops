@@ -3,7 +3,7 @@ services:
     image: ajaykumar91/trendstore-app:latest
     container_name: trendstore-container
     ports:
-      - "80:80"
+      - "5000:80"
     restart: always
     networks:
       - trend-nw
