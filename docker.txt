@@ -56,6 +56,7 @@ ssh -i jenkins-key-auto ubuntu@ec2-32-192-181-19.compute-1.amazonaws.com
 
 1. Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip -y
 unzip awscliv2.zip
 sudo ./aws/install
 aws --version

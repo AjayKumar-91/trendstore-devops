@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: trendstore-container
-        image: ajaykumar91/trendstore:latest
+        image: ajaykumar91/trendstore-app:latest
         ports:
         - containerPort: 80
         resources:

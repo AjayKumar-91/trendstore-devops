@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "ajaykumar91/trendstore-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_TAG = "latest"
         AWS_REGION = "us-east-1"
         CLUSTER_NAME = "trend-eks-cluster"
     }
