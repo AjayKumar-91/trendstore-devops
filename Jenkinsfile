@@ -63,19 +63,19 @@ pipeline {
             }
         }
 
+        stage('Check Monitoring Health') {
+            steps {
+                sh '''
+                    echo "Checking Prometheus targets..."
+                    curl -s http://prometheus.monitoring.svc.cluster.local:9090/-/ready || true
+                '''
+            }
+        }
+
         stage('Cleanup') {
             steps {
                 sh 'docker rmi $DOCKER_IMAGE:$IMAGE_TAG || true'
             }
-        }
-    }
-
-    stage('Check Monitoring Health') {
-        steps {
-            sh '''
-                echo "Checking Prometheus targets..."
-                curl -s http://prometheus.monitoring.svc.cluster.local:9090/-/ready || true
-                '''
         }
     }
 
