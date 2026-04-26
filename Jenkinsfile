@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
         DOCKER_IMAGE = "ajaykumar91/trendstore-app"
         IMAGE_TAG = "latest"
@@ -49,7 +53,6 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    sed -i 's|IMAGE_TAG|'"$IMAGE_TAG"'|g' kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/service.yaml
                 '''
