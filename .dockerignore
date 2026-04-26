@@ -1,7 +1,8 @@
+node_modules
 .git
 .gitignore
 Dockerfile
-node_modules
 README.md
 .vscode
 .env
+*.log

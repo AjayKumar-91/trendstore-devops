@@ -66,67 +66,36 @@ resource "aws_security_group" "jenkins_sg" {
   description = "Allow SSH and Jenkins ports"
   vpc_id      = aws_vpc.vpc_virginia.id
 
+
   ingress {
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    description = "Allow SSH"
-    cidr_blocks = ["0.0.0.0/0"] # SSH
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    description = "Allow HTTP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Jenkins"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    description = "Allow Jenkins Web UI"
-    cidr_blocks = ["0.0.0.0/0"] # Jenkins
-  }
-
-  ingress {
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    description = "Allow TrendStore App"
-    cidr_blocks = ["0.0.0.0/0"] # Application
-  }
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    description = "Allow Grafana UI"
-    cidr_blocks = ["0.0.0.0/0"] # Application
-  }
-
-  ingress {
-    from_port   = 9090
-    to_port     = 9090
-    protocol    = "tcp"
-    description = "Allow Prometheus UI"
-    cidr_blocks = ["0.0.0.0/0"] # Application
-  }
-
-  ingress {
-    from_port   = 9100
-    to_port     = 9100
-    protocol    = "tcp"
-    description = "Allow Node Exporter"
-    cidr_blocks = ["0.0.0.0/0"] # Application
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    description = "Allow all outbound traffic"
     cidr_blocks = ["0.0.0.0/0"]
   }
 

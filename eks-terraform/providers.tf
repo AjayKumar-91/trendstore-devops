@@ -1,21 +1,28 @@
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+}
+
+locals {
+  region          = "us-east-1"
+  name            = "trend-eks-cluster"
+  vpc_cidr        = "10.0.0.0/16"
+  azs             = ["us-east-1a", "us-east-1b"]
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
+  intra_subnets   = ["10.0.5.0/24", "10.0.6.0/24"]
+
+  tags = {
+    Project = local.name
+  }
+}
+
 provider "aws" {
-  region = var.region
-}
-
-data "aws_eks_cluster" "cluster" {
-  name       = aws_eks_cluster.eks.name
-  depends_on = [aws_eks_cluster.eks]
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name       = aws_eks_cluster.eks.name
-  depends_on = [aws_eks_cluster.eks]
-}
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(
-    data.aws_eks_cluster.cluster.certificate_authority[0].data
-  )
-  token = data.aws_eks_cluster_auth.cluster.token
+  region = local.region
 }
