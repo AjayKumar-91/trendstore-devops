@@ -19,6 +19,9 @@ ls /usr/share/nginx/html
 docker compose down -v
 docker compose up -d
 
+docker system prune -a -f
+docker volume prune -f
+
 docker ps
 docker ps -a
 docker images
@@ -51,8 +54,11 @@ ssh -i ~/jenkins-key-auto ubuntu@13.220.63.209
 
 chmod 400 jenkins-key-auto
 ssh -i jenkins-key-auto ubuntu@<NEW-IP>
+ssh -i ~/.ssh/jenkins-key-auto ubuntu@44.204.246.154
 ssh -i ~/jenkins-key-auto ubuntu@44.202.250.56
 ssh -i jenkins-key-auto ubuntu@ec2-32-192-181-19.compute-1.amazonaws.com
+
+# Kubernetes on AWS EKS — Start to End Guide
 
 1. Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -84,19 +90,24 @@ kubectl version --client
 eksctl version
 
 # Create EKS Cluster
-eksctl create cluster --name trend-eks-cluster --region us-east-1 --nodegroup-name trend-nodes \
+eksctl create cluster --name trend-eks-cluster --region us-east-1 --nodegroup-name trend-worker-nodes \
 --node-type t3.medium \
 --nodes 2 \
 --nodes-min 1 \
 --nodes-max 3 \
 --managed
 
+### Verify Cluster is Running
+aws eks list-clusters
 
-# Connect kubectl to Cluster
+## Check cluster list
+aws eks list-clusters --region us-east-1
+
+# Connect kubectl to Cluster/Update kubeconfig
 aws eks update-kubeconfig --region us-east-1 --name trend-eks-cluster
 
 # Verify Cluster is Running
-# 1. Check Nodes
+1. Check Nodes
 kubectl get nodes
 
 2. Check System Pods
@@ -105,12 +116,21 @@ kubectl get pods -A
 3. Check Cluster Info
 kubectl cluster-info
 
+4. Check cluster services
+kubectl get svc
+
 # Deploy apps
 kubectl apply -f kubernetes/deployment.yaml
 kubectl apply -f kubernetes/service.yaml
 
 # Delete node groups
-aws eks delete-nodegroup --cluster-name trend-eks-cluster --nodegroup-name trend-nodes --region us-east-1
+aws eks delete-nodegroup --cluster-name trend-eks-cluster --nodegroup-name trend-worker-nodes --region us-east-1
+
+# delete only the EKS cluster
+aws eks delete-cluster --name trend-eks-cluster --region us-east-1
+
+# Delete Entire EKS Cluster
+eksctl delete cluster --name trend-eks-cluster --region us-east-1
 
 Step 1: Check if Node Group Exists
 aws eks list-nodegroups --cluster-name trend-eks-cluster --region us-east-1
@@ -141,10 +161,6 @@ kubectl get pods
 kubectl get deployments
 kubectl get svc
 
-# Access Application After running
-
-
-aws configure --profile dev
 
 # correct path for Git Bash
 ssh -i /d/devops_projects/TrendStore/terraform/jenkins-key-auto ubuntu@3.237.173.35
@@ -158,10 +174,6 @@ docker build -t trendstore-app .
 docker tag trendstore-app ajaykumar91/trendstore-app:latest
 docker push ajaykumar91/trendstore-app:latest
 
-
-
-
-
 # 1. Add HashiCorp GPG key
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 
@@ -174,10 +186,25 @@ sudo apt update
 # 4. Install Terraform
 sudo apt install terraform -y
 
-
-
 aws eks --region us-east-1 update-kubeconfig --name trend-eks-cluster
 
 #  Connect to cluster
 aws eks update-kubeconfig --region us-east-1 --name trend-eks-cluster
 kubectl get nodes
+
+# CLEAN COMMAND BLOCK
+sudo apt update -y
+sudo apt install -y docker.io
+
+sudo systemctl enable docker
+sudo systemctl start docker
+
+sudo groupadd docker || true
+sudo usermod -aG docker ubuntu
+sudo usermod -aG docker jenkins
+
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
+
+sudo systemctl restart docker
+sudo systemctl restart jenkins

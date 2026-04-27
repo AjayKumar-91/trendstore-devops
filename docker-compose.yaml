@@ -29,8 +29,8 @@ services:
       - "9090:9090"
     volumes:
       - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yaml:ro
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yaml:ro
     networks:
       - trend-nw
     restart: unless-stopped  

@@ -53,6 +53,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                    set -e
+                    sed -i 's|IMAGE_TAG|$IMAGE_TAG|g' kubernetes/deployment.yaml || true
                     kubectl apply -f kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/service.yaml
                 '''
@@ -61,6 +63,7 @@ pipeline {
 
         stage('Verify Kubernetes Deployment') {
             steps {
+                sh 'kubectl rollout status deployment/trendstore-deployment'
                 sh 'kubectl get pods -o wide'
                 sh 'kubectl get svc'
             }
