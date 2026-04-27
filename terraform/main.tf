@@ -178,15 +178,16 @@ resource "aws_instance" "jenkins" {
               sudo systemctl start jenkins
 
               # Install Docker
-              sudo apt install -y docker.io
-              sudo systemctl enable docker
-              sudo systemctl start docker
+              apt install -y docker.io
+              systemctl enable docker
+              systemctl start docker
 
-              sudo usermod -aG docker $USER
-              sudo usermod -aG docker jenkins
+              # Add correct users
+              usermod -aG docker ubuntu || true
+              usermod -aG docker jenkins || true
               newgrp docker
-              sudo systemctl restart docker
-              sudo systemctl restart jenkins
+              systemctl restart docker
+              systemctl restart jenkins || true
 
               # Install Docker Compose
               sudo apt-get update -y
