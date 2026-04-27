@@ -185,16 +185,25 @@ resource "aws_instance" "jenkins" {
               sudo usermod -aG docker ubuntu
               sudo usermod -aG docker jenkins
 
+              # Install Docker Compose
+              sudo apt-get update -y
+              sudo apt install -y docker-compose-v2
+
               # Install kubectl
               curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
               chmod +x kubectl
               mv kubectl /usr/local/bin/
 
+              # WAIT for Jenkins to stabilize
+              sleep 90
+
+              echo "Jenkins setup completed" > /var/log/jenkins-ready.log
+
               EOF
 
   # root storage (EBS)
   root_block_device {
-    volume_size = 10
+    volume_size = 20
     volume_type = "gp3"
   }
 
@@ -203,7 +212,3 @@ resource "aws_instance" "jenkins" {
   }
 }
 
-# ---------------- Output ----------------
-output "jenkins_url" {
-  value = "http://${aws_instance.jenkins.public_ip}:8080"
-}
