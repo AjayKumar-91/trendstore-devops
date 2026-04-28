@@ -10,4 +10,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80 # k8s port
-      targetPort: 5000 # hostPort in the container
+      targetPort: 80 # hostPort in the container
+      

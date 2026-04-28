@@ -22,7 +22,7 @@ spec:
       - name: trendstore-container
         image: ajaykumar91/trendstore-app:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 80 # This should match the port your app listens on
         resources:
           limits:
             memory: "512Mi"

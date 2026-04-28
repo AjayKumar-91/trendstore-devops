@@ -1,18 +1,67 @@
 groups:
-- name: cpu-alerts
-  rules:
-  - alert: HighCPU
-    expr: 100 - (avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
-    for: 2m
 
-- name: cluster-alerts
+# =========================
+# NODE LEVEL ALERTS (KEEP)
+# =========================
+- name: node-alerts
   rules:
+
   - alert: NodeDown
     expr: up == 0
     for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Node is down"
+      description: "A target is not reachable"
 
-- name: memory-alerts
-  rules:
-  - alert: HighMemory
+  - alert: HighNodeCPU
+    expr: 100 - (avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU on node"
+      description: "Node CPU > 80%"
+
+  - alert: HighNodeMemory
     expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.2
     for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage on node"
+      description: "Node memory < 20% available"
+
+# =========================
+# KUBERNETES POD ALERTS (NEW)
+# =========================
+- name: kubernetes-pod-alerts
+  rules:
+
+  - alert: HighPodCPU
+    expr: sum(rate(container_cpu_usage_seconds_total{container!="",pod!=""}[5m])) by (pod) > 0.8
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU in pod {{ $labels.pod }}"
+      description: "Pod CPU usage > 80%"
+
+  - alert: HighPodMemory
+    expr: sum(container_memory_working_set_bytes{container!="",pod!=""}) by (pod) > 500 * 1024 * 1024
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory in pod {{ $labels.pod }}"
+      description: "Pod memory > 500MB"
+
+  - alert: PodCrashLooping
+    expr: increase(kube_pod_container_status_restarts_total[5m]) > 2
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Pod crash loop detected {{ $labels.pod }}"
+      description: "Pod restarting frequently"
