@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "ajaykumar91/trendstore-app"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG = "${BUILD_NUMBER}"
         AWS_REGION = "us-east-1"
         CLUSTER_NAME = "trend-eks-cluster"
     }
@@ -37,8 +37,8 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $DOCKER_IMAGE:$IMAGE_TAG
-                        docker tag $DOCKER_IMAGE:$IMAGE_TAG $DOCKER_IMAGE:latest
-                        docker push $DOCKER_IMAGE:latest
+                        docker tag $DOCKER_IMAGE:$IMAGE_TAG $DOCKER_IMAGE:$IMAGE_TAG
+                        docker push $DOCKER_IMAGE:$IMAGE_TAG
                     '''
                 }
             }
@@ -47,14 +47,15 @@ pipeline {
         stage('Update Kubeconfig') {
             steps {
                 sh 'aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME'
+                sh 'kubectl get nodes'
             }
-        }
+        }   
 
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
                     set -e
-                    sed -i 's|IMAGE_TAG|$IMAGE_TAG|g' kubernetes/deployment.yaml || true
+                    sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/service.yaml
                 '''
