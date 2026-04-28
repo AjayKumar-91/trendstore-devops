@@ -10,6 +10,7 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         AWS_REGION = "us-east-1"
         CLUSTER_NAME = "trend-eks-cluster"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -39,6 +40,26 @@ pipeline {
                         docker push $DOCKER_IMAGE:$IMAGE_TAG
                         docker tag $DOCKER_IMAGE:$IMAGE_TAG $DOCKER_IMAGE:$IMAGE_TAG
                         docker push $DOCKER_IMAGE:$IMAGE_TAG
+                    '''
+                }
+            }
+        }
+
+        stage('Configure AWS & EKS Access') {
+            steps {
+                // Use this block ONLY if not using EC2 IAM Role
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    sh '''
+                        mkdir -p ~/.kube
+                        aws eks update-kubeconfig \
+                          --region $AWS_REGION \
+                          --name $CLUSTER_NAME
+
+                        echo "Verifying cluster access..."
+                        kubectl get nodes
                     '''
                 }
             }
