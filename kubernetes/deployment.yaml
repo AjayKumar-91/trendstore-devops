@@ -19,7 +19,7 @@ spec:
       - name: trendstore-container
         image: ajaykumar91/trendstore-app:latest
         ports:
-        - containerPort: 80
+        - containerPort: 5000
         resources:
           limits:
             memory: "512Mi"
