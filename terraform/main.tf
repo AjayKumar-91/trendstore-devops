@@ -90,6 +90,34 @@ resource "aws_security_group" "jenkins_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "Grafana"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "prometheus"
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "TrendStore App"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "node exporter"
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
     description = "Allow all outbound traffic"
@@ -145,7 +173,7 @@ resource "aws_iam_instance_profile" "profile" {
 resource "aws_instance" "jenkins" {
   provider                    = aws.virginia
   ami                         = "ami-0ec10929233384c7f"
-  instance_type               = "t3.micro"
+  instance_type               = "m7i-flex.large"
   key_name                    = aws_key_pair.jenkins_key.key_name
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.subnet_virginia.id

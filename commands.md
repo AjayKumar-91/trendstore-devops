@@ -56,7 +56,7 @@ chmod 400 jenkins-key-auto
 ssh -i jenkins-key-auto ubuntu@<NEW-IP>
 ssh -i ~/.ssh/jenkins-key-auto ubuntu@44.204.246.154
 ssh -i ~/jenkins-key-auto ubuntu@44.202.250.56
-ssh -i jenkins-key-auto ubuntu@ec2-32-192-181-19.compute-1.amazonaws.com
+ssh -i jenkins-key-auto ubuntu@ec2-34-201-9-64.compute-1.amazonaws.com
 
 # Kubernetes on AWS EKS — Start to End Guide
 
@@ -97,7 +97,39 @@ eksctl create cluster --name trend-eks-cluster --region us-east-1 --nodegroup-na
 --nodes-max 3 \
 --managed
 
+eksctl create cluster --name trend-eks-cluster --region us-east-1 --node-type m7i-flex.large 
+
+eksctl delete cluster --name clustername --region regioncode
+
+eksctl delete cluster --name trend-eks-cluster --region us-east-1
+
+
+## Safe run (no SSH):
+eksctl create cluster \
+--name trend-eks-cluster \
+--region us-east-1 \
+--nodegroup-name trend-worker-nodes \
+--node-type m7i-flex.large \
+--nodes 2 \
+--nodes-min 1 \
+--nodes-max 3 \
+--managed \
+--ssh-access=false
+
+
+eksctl create cluster \
+--name trend-eks-cluster \
+--region us-east-1 \
+--nodegroup-name trend-worker-nodes \
+--node-type m7i.large \
+--nodes 2 \
+--nodes-min 1 \
+--nodes-max 3 \
+--managed \
+--zones us-east-1a,us-east-1b
+
 ### Verify Cluster is Running
+eksctl get cluster --region us-east-1
 aws eks list-clusters
 
 ## Check cluster list

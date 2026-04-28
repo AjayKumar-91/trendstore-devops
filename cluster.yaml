@@ -1,0 +1,27 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: trend-eks-cluster
+  region: us-east-1
+
+managedNodeGroups:
+  - name: trend-worker-nodes
+    instanceType: m7i.large
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 3
+
+    volumeSize: 20
+    volumeType: gp3
+
+    ssh:
+      allow: true
+      publicKeyName: jenkins-key-auto
+
+    labels:
+      role: worker
+
+    tags:
+      Environment: dev
+      Project: TrendStore
