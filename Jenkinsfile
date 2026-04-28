@@ -10,7 +10,6 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         AWS_REGION = "us-east-1"
         CLUSTER_NAME = "trend-eks-cluster"
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -24,11 +23,14 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:$IMAGE_TAG .'
+                sh '''
+                    set -e
+                    docker build -t $DOCKER_IMAGE:$IMAGE_TAG .
+                '''
             }
         }
 
-        stage('Login & Push to DockerHub') {
+        stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: "DockerHub_Credentials",
@@ -36,72 +38,55 @@ pipeline {
                     passwordVariable: "DOCKER_PASS"
                 )]) {
                     sh '''
+                        set -e
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $DOCKER_IMAGE:$IMAGE_TAG
-                        docker tag $DOCKER_IMAGE:$IMAGE_TAG $DOCKER_IMAGE:$IMAGE_TAG
-                        docker push $DOCKER_IMAGE:$IMAGE_TAG
                     '''
                 }
             }
         }
 
-        stage('Configure AWS & EKS Access') {
-            steps {
-                // Use this block ONLY if not using EC2 IAM Role
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh '''
-                        mkdir -p ~/.kube
-                        aws eks update-kubeconfig \
-                          --region $AWS_REGION \
-                          --name $CLUSTER_NAME
-
-                        echo "Verifying cluster access..."
-                        kubectl get nodes
-                    '''
-                }
-            }
-        }
-
-        stage('Update Kubeconfig') {
-            steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh '''
-                        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-                        kubectl get nodes
-                    '''
-                } 
-            }
-        }  
-
-        stage('Deploy to Kubernetes') {
+        // ✅ SINGLE SOURCE OF TRUTH
+        stage('Deploy to EKS') {
             steps {
                 sh '''
-                    set -e
-                    sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" kubernetes/deployment.yaml
+                    set -ex
+
+                    echo "=== AWS Identity ==="
+                    aws sts get-caller-identity
+
+                    echo "=== Configure kubeconfig ==="
+                    aws eks update-kubeconfig \
+                      --region $AWS_REGION \
+                      --name $CLUSTER_NAME
+
+                    echo "=== Verify access ==="
+                    kubectl get nodes
+
+                    echo "=== Update image tag ==="
+                    sed -i "s|IMAGE_TAG|${IMAGE_TAG}|g" kubernetes/deployment.yaml
+
+                    echo "=== Deploy ==="
                     kubectl apply -f kubernetes/deployment.yaml
                     kubectl apply -f kubernetes/service.yaml
                 '''
             }
         }
 
-        stage('Verify Kubernetes Deployment') {
+        stage('Verify Deployment') {
             steps {
-                sh 'kubectl rollout status deployment/trendstore-deployment'
-                sh 'kubectl get pods -o wide'
-                sh 'kubectl get svc'
+                sh '''
+                    set -e
+                    kubectl rollout status deployment/trendstore-deployment
+                    kubectl get pods -o wide
+                    kubectl get svc
+                '''
             }
         }
 
-        stage('Check Monitoring Health') {
+        stage('Monitoring Check') {
             steps {
                 sh '''
-                    echo "Checking Prometheus targets..."
                     curl -s http://prometheus.monitoring.svc.cluster.local:9090/-/ready || true
                 '''
             }
@@ -116,10 +101,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo '✅ Deployment successful!'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo '❌ Pipeline failed!'
         }
     }
 }
