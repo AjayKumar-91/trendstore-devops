@@ -1,127 +1,159 @@
-# React Application - Dockerized Deployment
+# 🚀 End-to-End DevOps CI/CD Pipeline Project (React + AWS + Kubernetes)
 
-This project contains a React application that has been containerized using Docker for easy deployment and scalability.
+This project demonstrates a **complete production-ready DevOps
+pipeline** for deploying a React application using modern tools like
+**Docker, Terraform, AWS EKS, Jenkins, GitHub, and Monitoring
+(Prometheus + Grafana).**
 
----
+------------------------------------------------------------------------
 
-## Project Overview
+# 📌 Project Overview
 
-* React-based frontend application
-* Dockerized using multi-stage build
-* Served via Nginx in production
-* Runs on port **3000**
+This project automates the complete software delivery lifecycle:
 
----
+-   Application Deployment (React)
+-   Containerization using Docker
+-   Infrastructure Provisioning using Terraform
+-   Kubernetes Deployment on AWS EKS
+-   CI/CD Automation using Jenkins
+-   Monitoring using Prometheus & Grafana
+-   Version Control using GitHub
 
-## Prerequisites
+------------------------------------------------------------------------
 
-Make sure you have the following installed:
+# 📂 Application Repository
 
-* Docker
-* Git
-* Node.js (optional for local development)
-
----
-
-## Clone Repository
-
-```bash
-git clone https://github.com/Vennilavanguvi/Trend.git
-cd Trend
+``` bash
+https://github.com/Vennilavanguvi/Trend.git
 ```
 
----
+------------------------------------------------------------------------
 
-## Docker Setup
+# ▶️ Run Application Locally
 
-### Create Dockerfile
+npm install npm start
 
-Create a file named `Dockerfile` in the root directory:
+Application runs on: http://localhost:3000
 
-```dockerfile
-# Step 1: Build React App
-FROM nginx:alpine
+------------------------------------------------------------------------
 
-RUN rm -rf /usr/share/nginx/html/*
+# 🐳 Docker Setup
 
-COPY ./Trend/dist/ /usr/share/nginx/html/
+## Build & Run Container
 
-EXPOSE 80
+docker build -t trend-app . docker run -p 3000:3000 trend-app
 
-CMD ["nginx", "-g", "daemon off;"]
-```
+## Push to DockerHub
 
----
+docker login docker tag trend-app
+`<dockerhub-username>`{=html}/trend-app docker push
+`<dockerhub-username>`{=html}/trend-app
 
-### 2️⃣ Build Docker Image
+------------------------------------------------------------------------
 
-```bash
-docker build -t trendstore-app .
-```
+# ☁️ Terraform Infrastructure (AWS)
 
----
+## Resources Created:
 
-### 3️⃣ Run Docker Container
+-   VPC
+-   Subnets
+-   Security Groups
+-   IAM Roles
+-   EC2 Instance (Jenkins Server)
+-   AWS EKS Cluster
 
-```bash
-docker run -d -p 3000:80 --name trendstore-container trendstore-app
-```
+## Commands:
 
----
+terraform init terraform plan terraform apply -auto-approve
 
-### 4️⃣ Access Application
+------------------------------------------------------------------------
 
-Open your browser and go to:
+# ☸️ Kubernetes Deployment (AWS EKS)
 
-```
-http://localhost:3000 or AWS ec2 url
-```
+## Files:
 
----
+-   deployment.yaml
+-   service.yaml
 
-## 📊 Verify Running Container
+## Deploy:
 
-```bash
-docker ps
-```
+kubectl apply -f deployment.yaml kubectl apply -f service.yaml
 
----
+## Verify:
 
-## 🛑 Stop & Remove Container
+kubectl get pods kubectl get svc
 
-```bash
-docker stop trendstore-container
-docker rm trendstore-container
-```
+## Access:
 
----
+http://`<LoadBalancer-External-IP>`{=html}:3000
 
-## ❗ Troubleshooting
+------------------------------------------------------------------------
 
-### 🔹 Port Not Accessible
+# 🔁 Jenkins CI/CD Pipeline
 
-Check logs:
+GitHub → Jenkins → Build → Docker Image → DockerHub → Kubernetes (EKS)
 
-```bash
-docker logs trendstore-container
-```
+Features: - GitHub Webhook Trigger - Automated Build - Docker Image
+Creation - Push to DockerHub - Deploy to EKS Cluster
 
----
+------------------------------------------------------------------------
 
-### 🔹 Docker Hub Rate Limit Error
+# 📂 Git Version Control
 
-Login to Docker:
+git init git add . git commit -m "Initial commit" git branch -M main git
+remote add origin `<repo-url>`{=html} git push -u origin main
 
-```bash
-docker login
-```
+Includes: - .gitignore - .dockerignore
 
----
+------------------------------------------------------------------------
 
-### 🔹 Container Already Exists
+# 📊 Monitoring (Prometheus + Grafana)
 
-```bash
-docker rm -f trendstore-container
-```
+Tools: - Prometheus - Grafana - kube-state-metrics
 
+Metrics: - Pod Health - CPU & Memory Usage - Node Performance -
+Application Availability
 
+------------------------------------------------------------------------
+
+# 🏗️ Architecture Flow
+
+Developer → GitHub → Jenkins → Docker → DockerHub → EKS → LoadBalancer →
+Monitoring
+
+------------------------------------------------------------------------
+
+# 📦 Deliverables
+
+-   GitHub Repo
+-   Terraform Code
+-   Kubernetes YAMLs
+-   Jenkins Pipeline
+-   Dockerfile
+-   Monitoring Setup
+
+------------------------------------------------------------------------
+
+# 🌐 Final Output
+
+-   React App on Kubernetes
+-   AWS LoadBalancer URL
+-   Fully Automated CI/CD Pipeline
+-   Monitoring Dashboard
+
+------------------------------------------------------------------------
+
+# 🎯 Key Highlights
+
+✔ End-to-End DevOps Pipeline\
+✔ AWS Cloud Deployment\
+✔ Kubernetes (EKS)\
+✔ CI/CD Automation\
+✔ Terraform IaC\
+✔ Monitoring System
+
+------------------------------------------------------------------------
+
+# 👨‍💻 Author
+
+DevOps Engineering Project
