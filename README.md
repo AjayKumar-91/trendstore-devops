@@ -28,6 +28,7 @@ This project automates the complete software delivery lifecycle:
 git clone https://github.com/Vennilavanguvi/Trend.git
 cd Trend
 ```
+<img width="1919" height="1019" alt="Screenshot 2026-04-24 150505" src="https://github.com/user-attachments/assets/fc2ae556-c01e-42c2-b8d4-784d4835f149" />
 
 ------------------------------------------------------------------------
 
@@ -40,7 +41,8 @@ serve -s . -l 3000
 
 Application runs on: 
 http://localhost:3000
-http://44-197-245-218:3000
+<img width="1919" height="1015" alt="Screenshot 2026-04-24 150535" src="https://github.com/user-attachments/assets/605a06c6-e596-44da-800f-9700976c00a8" />
+
 
 ------------------------------------------------------------------------
 🐳 Docker
@@ -58,6 +60,7 @@ docker build -t trend-app .
 docker run -p 3000:3000 trend-app
 ```
 
+<img width="1919" height="1019" alt="Screenshot 2026-04-24 153355" src="https://github.com/user-attachments/assets/f151a312-4abc-4d3a-8e6e-3ce9231d8862" />
 
 
 # ☁️ Terraform Infrastructure (AWS)
