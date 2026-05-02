@@ -58,11 +58,19 @@ eksctl create cluster \
 --name trend-eks-cluster \
 --region us-east-1 \
 --nodegroup-name trend-workers \
---node-type t3.medium \
+--node-type m7i-flex.large \
 --nodes 2 \
 --nodes-min 1 \
 --nodes-max 3 \
 --managed
+```
+
+```bash
+eksctl create cluster --name trend-eks-cluster --region us-east-1 --node-type m7i-flex.large 
+
+eksctl delete cluster --name clustername --region regioncode
+
+eksctl delete cluster --name trend-eks-cluster --region us-east-1
 ```
 
 ---
@@ -98,7 +106,7 @@ eksctl create nodegroup \
 --cluster trend-eks-cluster \
 --region us-east-1 \
 --name extra-nodes \
---node-type t3.medium \
+--node-type m7i-flex.large \
 --nodes 2 \
 --managed
 ```

@@ -4,18 +4,14 @@ global:
 
 rule_files:
   - "alert.rules.yaml"
-  
+
 alerting:
   alertmanagers:
     - static_configs:
         - targets:
-            - "alertmanager:9093"  
+            - "alertmanager:9093"
 
 scrape_configs:
-
-  - job_name: 'trendstore'
-    static_configs:
-      - targets: ['trendstore:80']
 
   - job_name: 'node-exporter'
     static_configs:
@@ -29,9 +25,7 @@ scrape_configs:
     static_configs:
       - targets: ['nginx-exporter:9113']
 
-  # 👇 ADD THIS HERE (Kubernetes job)
-  - job_name: 'kube-state-metrics'
+  - job_name: 'cadvisor'
     static_configs:
-      - targets:
-          - '192.168.35.189:32080'
-          - '192.168.26.120:32080'
+      - targets: ['cadvisor:8080']
+  

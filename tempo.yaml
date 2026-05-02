@@ -7,3 +7,9 @@ distributor:
       protocols:
         http:
         grpc:
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo

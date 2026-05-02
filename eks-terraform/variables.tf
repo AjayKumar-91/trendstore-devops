@@ -7,7 +7,7 @@ variable "cluster_name" {
 }
 
 variable "instance_type" {
-  default = "t3.small"
+  default = "m7i-flex.large"
 }
 
 variable "desired_size" {

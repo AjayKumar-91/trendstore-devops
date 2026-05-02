@@ -19,6 +19,9 @@ ls /usr/share/nginx/html
 docker compose down -v
 docker compose up -d
 
+# if State show unknown
+curl http://localhost:9090/api/v1/targets
+
 docker system prune -a -f
 docker volume prune -f
 
@@ -56,7 +59,7 @@ chmod 400 jenkins-key-auto
 ssh -i jenkins-key-auto ubuntu@<NEW-IP>
 ssh -i ~/.ssh/jenkins-key-auto ubuntu@44.204.246.154
 ssh -i ~/jenkins-key-auto ubuntu@44.202.250.56
-ssh -i jenkins-key-auto ubuntu@ec2-34-201-9-64.compute-1.amazonaws.com
+ssh -i jenkins-key-auto ubuntu@ec2-44-197-245-218.compute-1.amazonaws.com
 
 # Kubernetes on AWS EKS — Start to End Guide
 
@@ -91,7 +94,7 @@ eksctl version
 
 # Create EKS Cluster
 eksctl create cluster --name trend-eks-cluster --region us-east-1 --nodegroup-name trend-worker-nodes \
---node-type t3.medium \
+--node-type m7i-flex.large \
 --nodes 2 \
 --nodes-min 1 \
 --nodes-max 3 \
