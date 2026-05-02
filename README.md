@@ -152,28 +152,68 @@ git push -u origin main
 GitHub → Jenkins → Build → Docker Image → DockerHub → Kubernetes (EKS)
 
 Features: - GitHub Webhook Trigger - Automated Build - Docker Image
+
 Creation - Push to DockerHub - Deploy to EKS Cluster
 
-⚙️ Jenkins CI/CD
-📌 Tools Required:
+# ⚙️ Jenkins CI/CD
+## 📌 Tools Required:
+
 Jenkins
+
 Docker Plugin
+
 Git Plugin
+
 Kubernetes Plugin
+
 Pipeline Plugin
-📌 Setup:
+
+## 📌 Setup:
+
 Install Jenkins
+
 Configure GitHub integration
+
 Setup Webhook trigger
-🔁 Pipeline Flow:
+
+## 🔁 Pipeline Flow:
+
 GitHub → Jenkins → Build → Docker Image → DockerHub → Kubernetes Deploy
-📜 Pipeline Features:
+
+## 📜 Pipeline Features:
+
 Auto build on every commit
+
 Docker image creation
+
 Push to DockerHub
+
 Deploy to AWS EKS
 
 ------------------------------------------------------------------------
 
+# 📊 Monitoring (Open Source)
+## 📌 Tools:
 
+Prometheus
+
+Grafana
+
+## 📌 Purpose:
+
+Monitor cluster health
+
+Monitor application performance
+
+Visual dashboards
+
+## 📈 Metrics:
+
+CPU Usage
+
+Memory Usage
+
+Pod Health
+
+Node Status
 
